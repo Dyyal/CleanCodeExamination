@@ -25,10 +25,8 @@ namespace CleanCodeExamination.Services
 
         public void AddPlayer(string playerName)
         {
-
             _context.Add(playerName);
             _context.SaveChanges();
-
         }
 
         public void GetPlayer(string playerName)
