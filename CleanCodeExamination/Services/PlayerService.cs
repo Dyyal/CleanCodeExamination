@@ -25,7 +25,12 @@ namespace CleanCodeExamination.Services
 
         public void AddPlayer(string playerName)
         {
-            _context.Add(playerName);
+            Player player = new Player()
+            {
+                Id = Guid.NewGuid(),
+                Name = playerName
+            };
+            _context.Players.Add(player);
             _context.SaveChanges();
         }
 
@@ -35,16 +40,15 @@ namespace CleanCodeExamination.Services
             {
                 AddPlayer(playerName);
             }
-            else
-            {
-                _context.Players.Find(playerName);
-            }
+
+            _context.Players.Find(playerName);
         }
 
         public void UpdatePlayerData(string playerName, int guesses)
         {
-            Player player = _context.Find<Player>(playerName);
+            Player player = _context.Players.Find(playerName);
             player.Score.Guesses = guesses;
+            _context.SaveChanges();
         }
 
     }

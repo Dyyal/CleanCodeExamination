@@ -22,14 +22,14 @@ while (playOn)
 	string guess = Console.ReadLine();
 
 	int nGuess = 1;
-	string bbcc = checkBC(goal, guess);
+	string bbcc = CheckBullsAndCows(goal, guess);
 	Console.WriteLine(bbcc + "\n");
 	while (bbcc != "BBBB,")
 	{
 		nGuess++;
 		guess = Console.ReadLine();
 		Console.WriteLine(guess + "\n");
-		bbcc = checkBC(goal, guess);
+		bbcc = CheckBullsAndCows(goal, guess);
 		Console.WriteLine(bbcc + "\n");
 	}
 	StreamWriter output = new StreamWriter("result.txt", append: true);
@@ -46,31 +46,47 @@ while (playOn)
 
 static string makeGoal()
 {
-	Random randomGenerator = new Random();
-	string goal = "";
+	//Random randomGenerator = new Random();
+	//string goal = "";
+	//for (int i = 0; i < 4; i++)
+	//{
+	//	int random = randomGenerator.Next(10);
+	//	string randomDigit = "" + random;
+	//	while (goal.Contains(randomDigit))
+	//	{
+	//		random = randomGenerator.Next(10);
+	//		randomDigit = "" + random;
+	//	}
+	//	goal = goal + randomDigit;
+	//}
+	//return goal;
+
+	string targetNum = String.Empty;
+
 	for (int i = 0; i < 4; i++)
 	{
-		int random = randomGenerator.Next(10);
-		string randomDigit = "" + random;
-		while (goal.Contains(randomDigit))
-		{
-			random = randomGenerator.Next(10);
-			randomDigit = "" + random;
+		var randomNum = Random.Shared.Next(10).ToString();
+
+        while(targetNum.Contains(randomNum))
+        {
+			randomNum = Random.Shared.Next(10).ToString();
 		}
-		goal = goal + randomDigit;
+		targetNum = targetNum + randomNum;
 	}
-	return goal;
+
+	return targetNum;
 }
 
-static string checkBC(string goal, string guess)
+static string CheckBullsAndCows(string targetNum, string guess)
 {
 	int cows = 0, bulls = 0;
-	guess += "    ";     // if player entered less than 4 chars
-	for (int i = 0; i < 4; i++)
+    guess += "    ";     // if player entered less than 4 chars
+
+    for (int i = 0; i < 4; i++)
 	{
 		for (int j = 0; j < 4; j++)
 		{
-			if (goal[i] == guess[j])
+			if (targetNum[i] == guess[j])
 			{
 				if (i == j)
 				{

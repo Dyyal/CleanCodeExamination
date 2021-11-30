@@ -1,11 +1,5 @@
 ﻿using CleanCodeExamination.Data;
 using CleanCodeExamination.Entities;
-using CleanCodeExamination.Models;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace CleanCodeExamination.Services
 {
@@ -24,24 +18,27 @@ namespace CleanCodeExamination.Services
             _player = player;
         }
 
-        public void StartGame(bool startGame)
+        public void StartGame()
         {
-            if (startGame)
-            {
-                _playerService.EnterPlayerName();
-                PlayGame(true);
-            }
-            else
-            {
-                _ui.Exit();
-            }
+            //if (startGame)
+            //{
+            //    _playerService.EnterPlayerName();
+            //    PlayGame(true);
+            //}
+            //else
+            //{
+            //    _ui.Exit();
+            //}
+
+            _playerService.EnterPlayerName();
+            PlayGame(true);
         }
 
         private void PlayGame(bool playOn)
         {
             while (playOn)
             {
-                string goal = CreateGoal();
+                string goal = CreateTargetNumber();
 
 
                 _ui.Output("New game:");
@@ -68,8 +65,9 @@ namespace CleanCodeExamination.Services
                 return;
 
                 PlayersHighscore();
+
                 Console.WriteLine("Correct, it took " + guesses + " guesses\nContinue?");
-                string answer = Console.ReadLine();
+                string answer = _ui.Input();
                 if (answer != null && answer != "" && answer.Substring(0, 1) == "n")
                 {
                     playOn = false;
@@ -77,28 +75,35 @@ namespace CleanCodeExamination.Services
             }
         }
 
-        public string CreateGoal()
+        public string CreateTargetNumber()
         {
-            Random randomGenerator = new Random();
-            string goal = "";
+            string targetNum = String.Empty;
+
             for (int i = 0; i < 4; i++)
             {
-                int random = randomGenerator.Next(10);
-                string randomDigit = "" + random;
-                while (goal.Contains(randomDigit))
+                var randomNum = Random.Shared.Next(10).ToString();
+
+                while (targetNum.Contains(randomNum))
                 {
-                    random = randomGenerator.Next(10);
-                    randomDigit = "" + random;
+                    randomNum = Random.Shared.Next(10).ToString();
                 }
-                goal = goal + randomDigit;
+                targetNum = targetNum + randomNum;
             }
-            return goal;
+
+            return targetNum;
         }
 
-        static string checkBC(string goal, string guess)
+        public string checkBC(string goal, string guess)
         {
             int cows = 0, bulls = 0;
             guess += "    ";     // if player entered less than 4 chars
+
+            //if (guess.Count() < 4)
+            //{
+            //    Console.WriteLine("You've entered less than 4 digits. Try again");
+            //    PlayGame(true);
+            //}
+
             for (int i = 0; i < 4; i++)
             {
                 for (int j = 0; j < 4; j++)
@@ -119,7 +124,7 @@ namespace CleanCodeExamination.Services
             return "BBBB".Substring(0, bulls) + "," + "CCCC".Substring(0, cows);
         }
 
-        static void PlayersHighscore()
+        public void PlayersHighscore()
         {
             //StreamReader input = new StreamReader("result.txt");
             //List<PlayerData> results = new List<PlayerData>();
@@ -143,20 +148,21 @@ namespace CleanCodeExamination.Services
 
             //}
 
-            List<Player> results = new();
+            //List<Player> results = new();
+            
+            //results.Sort((p1, p2) => p1.Score.Average.CompareTo(p2.Score.Average));
 
-            results.Sort((p1, p2) => p1.Average().CompareTo(p2.Average()));
-            Console.WriteLine("Player   games average");
-            foreach (PlayerData p in results)
+            var result = _context.Players.GroupBy(x => x.Name)
+                .Select(x => x.OrderByDescending(x => x.Score.Average).First())
+                .OrderByDescending(x => x.Score)
+                .ThenBy(x => x.Name);
+
+            _ui.Output("Player   games average");
+            foreach (Player p in result)
             {
-                Console.WriteLine(string.Format("{0,-9}{1,5:D}{2,9:F2}", p.Name, p.NGames, p.Average()));
+                _ui.Output(string.Format("{0,-9}{1,5:D}{2,9:F2}", p.Name, p.Score.RoundsPlayed, p.Score.Average));
             }
-            input.Close();
         }
 
-        public double Average()
-        {
-            return (double)totalGuess / NGames;
-        }
     }
 }
