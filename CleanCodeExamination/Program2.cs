@@ -1,8 +1,4 @@
-﻿using System;
-using System.IO;
-using System.Collections.Generic;
-
-namespace MooGame
+﻿namespace MooGame
 {
 	class MainClass
 	{

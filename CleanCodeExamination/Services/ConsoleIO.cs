@@ -1,16 +1,10 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace CleanCodeExamination.Services
+﻿namespace CleanCodeExamination.Services
 {
     public class ConsoleIO : IUserInterface
     {
         public void Exit()
         {
-            System.Environment.Exit(0);
+            Environment.Exit(0);
         }
 
         public string Input()
