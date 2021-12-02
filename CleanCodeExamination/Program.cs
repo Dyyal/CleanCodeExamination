@@ -4,7 +4,8 @@
 
 using CleanCodeExamination.Controllers;
 
-GameController gameController;
+GameService game = new GameService();
+GameController gameController = new(game);
 gameController.RunGame();
 
 ////bool startgame från GameService

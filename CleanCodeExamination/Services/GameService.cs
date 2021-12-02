@@ -13,6 +13,11 @@
             _player = player;
         }
 
+        public GameService()
+        {
+
+        }
+
         public void StartGame()
         {
             _playerService.EnterPlayerName();
