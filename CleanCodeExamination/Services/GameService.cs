@@ -13,11 +13,6 @@
             _player = player;
         }
 
-        public GameService()
-        {
-
-        }
-
         public void StartGame()
         {
             _playerService.EnterPlayerName();
@@ -34,32 +29,38 @@
                 _ui.Output("New game:");
                 //comment out or remove next line to play real games!
                 _ui.Output($"For practice, number is: {target}");
-                string guess = _ui.Input();
 
-                _player.Score.Guesses = 1;
-                string bbcc = CheckBullsAndCows(target, guess);
-                Console.WriteLine(bbcc + "\n");
+                int guesses = 1;
+                string bullsAndCows = CheckBullsAndCows(target, _ui.Input());
+                _ui.Output(bullsAndCows);
 
-                while (bbcc != "BBBB,")
+                while (bullsAndCows is not "BBBB,")
                 {
-                    _player.Score.Guesses++;
-                    guess = _ui.Input();
-                    bbcc = CheckBullsAndCows(target, _ui.Input());
-                    _ui.Output(bbcc);
+                    guesses++;
+                    bullsAndCows = CheckBullsAndCows(target, _ui.Input());
+                    _ui.Output(bullsAndCows);
                 }
 
-                _playerService.UpdatePlayerData(_player.Name, _player.Score.Guesses);
-                
+                _playerService.UpdatePlayerScore(_player.Name, guesses);
+
                 _playerService.PlayersHighscore();
 
-                _ui.Output($"Correct, it took {_player.Score.Guesses} guesses\nContinue? y/n");
-                string answer = _ui.Input();
-                if (answer.Substring(0, 1) is "n")
-                {
-                    playOn = false;
-                    _ui.Exit();
-                }
+                _ui.Output($"Correct, it took {guesses} guesses\nContinue? y/n");
+
+                EndOrRestartGame(_ui.Input());
             }
+        }
+
+        private void EndOrRestartGame(string answer)
+        {
+            Dictionary<string, Action> commands = new()
+            {
+                { "n", () => _ui.Exit() },
+                { "y", () => PlayGame(true) },
+                { default, () => { _ui.Output("Wrong command. Try again"); EndOrRestartGame(_ui.Input()); } }
+            };
+
+            commands[answer].Invoke();
         }
 
         public string CreateTargetNumber()
@@ -84,9 +85,9 @@
         {
             int cows = 0, bulls = 0;
 
-            while (guess.Count() < 4)
+            while (guess.Count() is not 4)
             {
-                _ui.Output("You've entered less than 4 digits. Try again: ");
+                _ui.Output("You've entered less or more than 4 digits. Try again: ");
                 guess = _ui.Input();
             }
 

@@ -2,6 +2,7 @@
 using CleanCodeExamination.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -9,9 +10,10 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace CleanCodeExamination.Migrations
 {
     [DbContext(typeof(Context))]
-    partial class ContextModelSnapshot : ModelSnapshot
+    [Migration("20211203120206_v8")]
+    partial class v8
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder.HasAnnotation("ProductVersion", "6.0.0");
@@ -40,6 +42,9 @@ namespace CleanCodeExamination.Migrations
                     b.Property<int>("Guesses")
                         .HasColumnType("INTEGER");
 
+                    b.Property<int>("Highscore")
+                        .HasColumnType("INTEGER");
+
                     b.Property<string>("PlayerId")
                         .HasColumnType("TEXT");
 
@@ -48,8 +53,7 @@ namespace CleanCodeExamination.Migrations
 
                     b.HasKey("ScoreId");
 
-                    b.HasIndex("PlayerId")
-                        .IsUnique();
+                    b.HasIndex("PlayerId");
 
                     b.ToTable("Scores");
                 });
@@ -57,8 +61,8 @@ namespace CleanCodeExamination.Migrations
             modelBuilder.Entity("CleanCodeExamination.Data.Entities.Score", b =>
                 {
                     b.HasOne("CleanCodeExamination.Data.Entities.Player", "Player")
-                        .WithOne("Score")
-                        .HasForeignKey("CleanCodeExamination.Data.Entities.Score", "PlayerId");
+                        .WithMany("Score")
+                        .HasForeignKey("PlayerId");
 
                     b.Navigation("Player");
                 });

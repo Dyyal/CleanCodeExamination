@@ -2,6 +2,7 @@
 using CleanCodeExamination.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -9,9 +10,10 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace CleanCodeExamination.Migrations
 {
     [DbContext(typeof(Context))]
-    partial class ContextModelSnapshot : ModelSnapshot
+    [Migration("20211203192614_v9")]
+    partial class v9
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder.HasAnnotation("ProductVersion", "6.0.0");
@@ -24,7 +26,12 @@ namespace CleanCodeExamination.Migrations
                     b.Property<string>("Name")
                         .HasColumnType("TEXT");
 
+                    b.Property<string>("ScoreId")
+                        .HasColumnType("TEXT");
+
                     b.HasKey("Id");
+
+                    b.HasIndex("ScoreId");
 
                     b.ToTable("Players");
                 });
@@ -40,31 +47,20 @@ namespace CleanCodeExamination.Migrations
                     b.Property<int>("Guesses")
                         .HasColumnType("INTEGER");
 
-                    b.Property<string>("PlayerId")
-                        .HasColumnType("TEXT");
-
                     b.Property<int>("RoundsPlayed")
                         .HasColumnType("INTEGER");
 
                     b.HasKey("ScoreId");
 
-                    b.HasIndex("PlayerId")
-                        .IsUnique();
-
                     b.ToTable("Scores");
-                });
-
-            modelBuilder.Entity("CleanCodeExamination.Data.Entities.Score", b =>
-                {
-                    b.HasOne("CleanCodeExamination.Data.Entities.Player", "Player")
-                        .WithOne("Score")
-                        .HasForeignKey("CleanCodeExamination.Data.Entities.Score", "PlayerId");
-
-                    b.Navigation("Player");
                 });
 
             modelBuilder.Entity("CleanCodeExamination.Data.Entities.Player", b =>
                 {
+                    b.HasOne("CleanCodeExamination.Data.Entities.Score", "Score")
+                        .WithMany()
+                        .HasForeignKey("ScoreId");
+
                     b.Navigation("Score");
                 });
 #pragma warning restore 612, 618

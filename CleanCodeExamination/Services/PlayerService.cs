@@ -1,6 +1,6 @@
 ﻿namespace CleanCodeExamination.Services
 {
-    public class PlayerService
+    public class PlayerService : IPlayerInterface
     {
         private Context _context;
         private IUserInterface _ui;
@@ -20,81 +20,66 @@
             GetPlayer(_player.Name);
         }
 
-        public void AddPlayer(string playerName)
-        {
-            Player player = new Player()
-            {
-                Id = Guid.NewGuid(),
-                Name = playerName
-            };
-            _context.Players.Add(player);
-            _context.SaveChanges();
-        }
-
         public void GetPlayer(string playerName)
         {
             if (!_context.Players.Any(x => x.Name == playerName))
             {
-                AddPlayer(playerName);
+                CreatePlayer(playerName);
             }
 
             _context.Players.Find(playerName);
         }
 
-        public void UpdatePlayerData(string playerName, int guesses)
+        public void CreatePlayer(string playerName)
         {
-            Player player = _context.Players.Find(playerName);
-            player.Score.Guesses = guesses;
+            Player player = PlayerFactory.CreatePlayer(playerName);
+            _context.Players.Add(player);
             _context.SaveChanges();
+        }
+
+        public void UpdatePlayerScore(string playerName, int guesses)
+        {
+            Player player = _context.Players.Where(p => p.Name == playerName).FirstOrDefault();
+
+            if (!_context.Scores.Any(x => x.PlayerId == player.Id))
+            {
+                CreateScore(guesses, player);
+            }
+            else
+            {
+                UpdateScore(guesses, player);
+            }
+            _context.SaveChanges();
+        }
+
+        private void CreateScore(int guesses, Player player)
+        {
+            Score score = ScoreFactory.CreateScore(player, guesses);
+            score.Average = Average(score);
+            _context.Scores.Add(score);
+        }
+
+        private void UpdateScore(int guesses, Player player)
+        {
+            Score score = _context.Scores.FirstOrDefault(x => x.PlayerId == player.Id);
+            score.RoundsPlayed++;
+            score.Guesses += guesses;
+            score.Average = Average(score);
+            _context.Scores.Update(score);
         }
 
         public void PlayersHighscore()
         {
-            //StreamReader input = new StreamReader("result.txt");
-            //List<PlayerData> results = new List<PlayerData>();
-            //string line;
-            //while ((line = input.ReadLine()) != null)
-            //{
-            //    string[] nameAndScore = line.Split(new string[] { "#&#" }, StringSplitOptions.None);
-            //    string name = nameAndScore[0];
-            //    int guesses = Convert.ToInt32(nameAndScore[1]);
-            //    PlayerData pd = new PlayerData(name, guesses);
-            //    int pos = results.IndexOf(pd);
-            //    if (pos < 0)
-            //    {
-            //        results.Add(pd);
-            //    }
-            //    else
-            //    {
-            //        results[pos].Update(guesses);
-            //    }
+            var highscore = _context.Scores.Include(x => x.Player).OrderBy(x => x.Average);
 
-
-            //}
-
-            //List<Player> results = new();
-
-            //results.Sort((p1, p2) => p1.Score.Average.CompareTo(p2.Score.Average));
-
-            var result = _context.Players.GroupBy(x => x.Name)
-                .Select(x => x.OrderByDescending(x => x.Score.Average).First())
-                .OrderByDescending(x => x.Score)
-                .ThenBy(x => x.Name);
-
-            //var result = _context.Scores.GroupBy(x => x.Player)
-            //    .Select(g => new
-            //    {
-            //        Player = g.Key,
-            //        Score = g.Max(p => p.Average)
-            //    })
-            //    .OrderByDescending(x => x.Score);
-
-            _ui.Output("Player   games average");
-            foreach (Player p in result)
+            _ui.Output("Player   games   average");
+            foreach (Score p in highscore)
             {
-                _ui.Output(string.Format("{0,-9}{1,5:D}{2,9:F2}", p.Name, p.Score.RoundsPlayed, p.Score.Average));
+                _ui.Output(string.Format("{0,-9}{1,5:D}{2,9:F2}", p.Player.Name, p.RoundsPlayed, p.Average));
             }
         }
+
+        public double Average(Score score) => Math.Round((double)score.Guesses / score.RoundsPlayed, 2);
 
     }
 }
