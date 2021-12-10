@@ -1,22 +1,14 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace CleanCodeExamination.Services
+﻿namespace CleanCodeExamination.Services
 {
     public interface IPlayerInterface
     {
         void EnterPlayerName();
 
         void CreatePlayer(string playerName);
-        void GetPlayer(string playerName);
+        string GetPlayer();
 
         void UpdatePlayerScore(string playerName, int guesses);
 
         void PlayersHighscore();
-
-        double Average(Score score);
     }
 }

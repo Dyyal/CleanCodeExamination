@@ -1,6 +1,4 @@
-﻿using Microsoft.EntityFrameworkCore;
-
-namespace CleanCodeExamination.Data
+﻿namespace CleanCodeExamination.Data
 {
     public class Context : DbContext
     {

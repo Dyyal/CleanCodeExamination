@@ -1,63 +1,68 @@
 ﻿namespace CleanCodeExamination.Services
 {
-    public class GameService
+    public class GameService : IGameInterface
     {
         private IUserInterface _ui;
-        private PlayerService _playerService;
-        private Player _player;
+        private IPlayerInterface _IPlayer;
+        int guesses;
 
-        public GameService(IUserInterface ui, PlayerService playerService, Player player)
+        public GameService(IUserInterface ui, IPlayerInterface IPlayer)
         {
             _ui = ui;
-            _playerService = playerService;
-            _player = player;
+            _IPlayer = IPlayer;
         }
 
         public void StartGame()
         {
-            _playerService.EnterPlayerName();
+            _IPlayer.EnterPlayerName();
             PlayGame(true);
         }
 
-        private void PlayGame(bool playOn)
+        public void PlayGame(bool playOn)
         {
             while (playOn)
             {
                 string target = CreateTargetNumber();
 
-
                 _ui.Output("New game:");
                 //comment out or remove next line to play real games!
                 _ui.Output($"For practice, number is: {target}");
 
-                int guesses = 1;
-                string bullsAndCows = CheckBullsAndCows(target, _ui.Input());
-                _ui.Output(bullsAndCows);
+                MakeGuess(target);
 
-                while (bullsAndCows is not "BBBB,")
-                {
-                    guesses++;
-                    bullsAndCows = CheckBullsAndCows(target, _ui.Input());
-                    _ui.Output(bullsAndCows);
-                }
+                string playerName = _IPlayer.GetPlayer();
 
-                _playerService.UpdatePlayerScore(_player.Name, guesses);
+                _IPlayer.UpdatePlayerScore(playerName, guesses);
 
-                _playerService.PlayersHighscore();
+                _IPlayer.PlayersHighscore();
 
                 _ui.Output($"Correct, it took {guesses} guesses\nContinue? y/n");
-
                 EndOrRestartGame(_ui.Input());
+            }
+            _ui.Exit();
+        }
+
+        public void MakeGuess(string target)
+        {
+            guesses = 1;
+            string bullsAndCows = CheckBullsAndCows(target, _ui.Input());
+            _ui.Output(bullsAndCows);
+
+            while (bullsAndCows is not "BBBB,")
+            {
+                guesses++;
+                bullsAndCows = CheckBullsAndCows(target, _ui.Input());
+                _ui.Output(bullsAndCows);
             }
         }
 
-        private void EndOrRestartGame(string answer)
+        public void EndOrRestartGame(string answer)
         {
             Dictionary<string, Action> commands = new()
             {
-                { "n", () => _ui.Exit() },
+                { "n", () => PlayGame(false) },
                 { "y", () => PlayGame(true) },
-                { default, () => { _ui.Output("Wrong command. Try again"); EndOrRestartGame(_ui.Input()); } }
+                { String.Empty, () => { _ui.Output("Wrong command. Try again"); EndOrRestartGame(_ui.Input()); } }
             };
 
             commands[answer].Invoke();

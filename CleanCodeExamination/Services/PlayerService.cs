@@ -4,30 +4,30 @@
     {
         private Context _context;
         private IUserInterface _ui;
-        private Player _player;
 
-        public PlayerService(Context context, IUserInterface ui, Player player)
+        Player player = PlayerFactory.CreatePlayer();
+
+        public PlayerService(Context context, IUserInterface ui)
         {
             _context = context;
             _ui = ui;
-            _player = player;
         }
 
         public void EnterPlayerName()
         {
             _ui.Output("Enter your name: ", false);
-            _player.Name = _ui.Input();
-            GetPlayer(_player.Name);
+            player.Name = _ui.Input();
+            GetPlayer();
         }
 
-        public void GetPlayer(string playerName)
+        public string GetPlayer()
         {
-            if (!_context.Players.Any(x => x.Name == playerName))
+            if (!_context.Players.Any(x => x.Name == player.Name))
             {
-                CreatePlayer(playerName);
+                CreatePlayer(player.Name);
             }
 
-            _context.Players.Find(playerName);
+            return player.Name;
         }
 
         public void CreatePlayer(string playerName)
@@ -43,28 +43,26 @@
 
             if (!_context.Scores.Any(x => x.PlayerId == player.Id))
             {
-                CreateScore(guesses, player);
+                CreateScore(player, guesses);
             }
             else
             {
-                UpdateScore(guesses, player);
+                UpdateScore(player, guesses);
             }
             _context.SaveChanges();
         }
 
-        private void CreateScore(int guesses, Player player)
+        private void CreateScore(Player player, int guesses)
         {
             Score score = ScoreFactory.CreateScore(player, guesses);
-            score.Average = Average(score);
+            score.Average = ScoreFactory.Average(score);
             _context.Scores.Add(score);
         }
 
-        private void UpdateScore(int guesses, Player player)
+        private void UpdateScore(Player player, int guesses)
         {
             Score score = _context.Scores.FirstOrDefault(x => x.PlayerId == player.Id);
-            score.RoundsPlayed++;
-            score.Guesses += guesses;
-            score.Average = Average(score);
+            ScoreFactory.UpdateScore(guesses, score);
             _context.Scores.Update(score);
         }
 
@@ -78,8 +76,6 @@
                 _ui.Output(string.Format("{0,-9}{1,5:D}{2,9:F2}", p.Player.Name, p.RoundsPlayed, p.Average));
             }
         }
-
-        public double Average(Score score) => Math.Round((double)score.Guesses / score.RoundsPlayed, 2);
 
     }
 }

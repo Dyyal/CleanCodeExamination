@@ -1,10 +1,6 @@
-﻿//// See https://aka.ms/new-console-template for more information
-
-
+﻿var database = new Context();
 IUserInterface ui = new ConsoleIO();
-var database = new Context();
-Player player = new();
-PlayerService playerService = new(database, ui, player);
-GameService game = new(ui, playerService, player);
+IPlayerInterface player = new PlayerService(database, ui);
+IGameInterface game = new GameService(ui, player);
 GameController gameController = new(game);
 gameController.RunGame();

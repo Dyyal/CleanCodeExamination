@@ -1,10 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace CleanCodeExamination.Data.Entities
+﻿namespace CleanCodeExamination.Data.Entities
 {
     public class PlayerFactory
     {
@@ -15,6 +9,11 @@ namespace CleanCodeExamination.Data.Entities
                 Id = Guid.NewGuid().ToString(),
                 Name = playerName
             };
+        }
+
+        public static Player CreatePlayer()
+        {
+            return new Player();
         }
     }
 }

@@ -2,9 +2,9 @@
 {
     public class GameController
     {
-        private readonly GameService _game;
+        private readonly IGameInterface _game;
 
-        public GameController(GameService game)
+        public GameController(IGameInterface game)
         {
             _game = game;
         }
