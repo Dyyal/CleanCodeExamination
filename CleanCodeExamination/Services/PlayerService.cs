@@ -76,6 +76,5 @@
                 _ui.Output(string.Format("{0,-9}{1,5:D}{2,9:F2}", p.Player.Name, p.RoundsPlayed, p.Average));
             }
         }
-
     }
 }

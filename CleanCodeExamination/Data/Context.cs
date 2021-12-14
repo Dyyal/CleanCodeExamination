@@ -16,5 +16,12 @@
             var path = Environment.GetFolderPath(folder);
             DataSource = $"{path}{Path.DirectorySeparatorChar}MooGame.db";
         }
+
+        public Context(DbContextOptions options)
+        {
+            var folder = Environment.SpecialFolder.Desktop;
+            var path = Environment.GetFolderPath(folder);
+            DataSource = $"{path}{Path.DirectorySeparatorChar}MooTest.db";
+        }
     }
 }
