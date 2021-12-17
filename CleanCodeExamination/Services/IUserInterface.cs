@@ -4,6 +4,5 @@
     {
         public string Input();
         public void Output(string text, bool newLine = true);
-        public void Exit();
     }
 }

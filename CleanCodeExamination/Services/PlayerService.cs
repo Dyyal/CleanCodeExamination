@@ -17,7 +17,6 @@
         {
             _ui.Output("Enter your name: ", false);
             player.Name = _ui.Input();
-            GetPlayer();
         }
 
         public string GetPlayer()
@@ -55,7 +54,6 @@
         private void CreateScore(Player player, int guesses)
         {
             Score score = ScoreFactory.CreateScore(player, guesses);
-            score.Average = ScoreFactory.Average(score);
             _context.Scores.Add(score);
         }
 

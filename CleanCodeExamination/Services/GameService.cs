@@ -5,7 +5,7 @@
         private IUserInterface _ui;
         private IPlayerInterface _IPlayer;
         int guesses;
-
+        public static string target;
         public GameService(IUserInterface ui, IPlayerInterface IPlayer)
         {
             _ui = ui;
@@ -20,9 +20,9 @@
 
         public void PlayGame(bool playOn)
         {
-            while (playOn)
+            if(playOn)
             {
-                string target = CreateTargetNumber();
+                target = CreateTargetNumber();
 
                 _ui.Output("New game:");
                 //comment out or remove next line to play real games!
@@ -39,7 +39,6 @@
                 _ui.Output($"Correct, it took {guesses} guesses\nContinue? y/n");
                 EndOrRestartGame(_ui.Input());
             }
-            _ui.Exit();
         }
 
         public void MakeGuess(string target)
@@ -58,14 +57,22 @@
 
         public void EndOrRestartGame(string answer)
         {
-            Dictionary<string, Action> commands = new()
+            try
             {
-                { "n", () => PlayGame(false) },
-                { "y", () => PlayGame(true) },
-                { String.Empty, () => { _ui.Output("Wrong command. Try again"); EndOrRestartGame(_ui.Input()); } }
-            };
+                Dictionary<string, Action> commands = new()
+                {
+                    { "n", () => PlayGame(false) },
+                    { "y", () => PlayGame(true) },
+                    { String.Empty, () => { _ui.Output("You've entered an empty string. Try again"); EndOrRestartGame(_ui.Input()); } }
+                };
 
-            commands[answer].Invoke();
+                commands[answer].Invoke();
+            }
+            catch (KeyNotFoundException ex)
+            {
+                _ui.Output($"{ex.Message} Try again");
+                EndOrRestartGame(_ui.Input());
+            }
         }
 
         public string CreateTargetNumber()

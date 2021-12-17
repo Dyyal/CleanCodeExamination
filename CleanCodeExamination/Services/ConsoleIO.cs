@@ -2,10 +2,6 @@
 {
     public class ConsoleIO : IUserInterface
     {
-        public void Exit()
-        {
-            Environment.Exit(0);
-        }
 
         public string Input()
         {

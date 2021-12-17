@@ -1,3 +1,4 @@
+using CleanCodeExamination.Controllers;
 using CleanCodeExamination.Data;
 using CleanCodeExamination.Data.Entities;
 using CleanCodeExamination.Services;
@@ -16,9 +17,10 @@ namespace TestProject3
 
         Context context;
 
+        MockIU ui;
         IGameInterface game;
-        IUserInterface ui;
         IPlayerInterface player;
+        public static string target;
 
         [OneTimeSetUp]
         public void Setup()
@@ -26,7 +28,7 @@ namespace TestProject3
             context = new Context(dbContextOptions);
             context.Database.EnsureCreated();
 
-            ui = new ConsoleIO();
+            ui = new();
             player = new PlayerService(context, ui);
             game = new GameService(ui, player);
         }
@@ -41,14 +43,19 @@ namespace TestProject3
         public void TestGuessAndTarget()
         {
             string target = "4579";
-            string guess = "4479";
+            string guess = "4379";
             string bullsAndCows = game.CheckBullsAndCows(target, guess);
-            Assert.AreEqual("BBB,C", bullsAndCows);
+
+            Assert.AreEqual("BBB,", bullsAndCows);
+
             guess = "4087";
             bullsAndCows = game.CheckBullsAndCows(target, guess);
+
             Assert.AreEqual("B,C", bullsAndCows);
+
             guess = "4579";
             bullsAndCows = game.CheckBullsAndCows(target, guess);
+
             Assert.AreEqual("BBBB,", bullsAndCows);
         }
 
@@ -56,8 +63,22 @@ namespace TestProject3
         public void TestTargetCreator()
         {
             var target = game.CreateTargetNumber();
+
             Assert.IsNotNull(target);
             Assert.AreEqual(4, target.Length);
+        }
+
+        [Test]
+        public void TestAverageScore()
+        {
+            Score score = new Score
+            {
+                Guesses = 6,
+                RoundsPlayed = 2
+            };
+            score.Average = ScoreFactory.Average(score);
+
+            Assert.AreEqual(3, score.Average);
         }
 
         [Test]
@@ -65,8 +86,9 @@ namespace TestProject3
         {
             var playerName = "Keko";
             player.CreatePlayer(playerName);
-
             var newPlayer = context.Players.FirstOrDefault(p => p.Name == playerName);
+
+            Assert.IsNotNull(newPlayer);
             Assert.AreEqual(playerName, newPlayer.Name);
         }
 
@@ -74,22 +96,61 @@ namespace TestProject3
         public void TestCreateScore()
         {
             var playerName = "Keko";
-            var newPlayer = context.Players.FirstOrDefault(p => p.Name == playerName);
             int guesses = 2;
             player.UpdatePlayerScore(playerName, guesses);
+            var playerScore = context.Scores.FirstOrDefault(p => p.Player.Name == playerName);
 
-            Assert.AreEqual(2, newPlayer.Score.Guesses);
+            Assert.IsNotNull(playerScore);
+            Assert.AreEqual(2, playerScore.Guesses);
         }
 
         [Test]
         public void TestUpdateScore()
         {
             var playerName = "Keko";
-            var newPlayer = context.Players.FirstOrDefault(p => p.Name == playerName);
             int guesses = 4;
             player.UpdatePlayerScore(playerName, guesses);
+            var playerScore = context.Scores.FirstOrDefault(p => p.Player.Name == playerName);
 
-            Assert.AreEqual(6, newPlayer.Score.Guesses);
+            Assert.IsNotNull(playerScore);
+            Assert.AreEqual(6, playerScore.Guesses);
+        }
+
+        [Test]
+        public void TestGame()
+        {
+            GameController gameController = new(game);
+
+            gameController.RunGame();
+
+            Assert.IsNotNull(() => gameController.RunGame());
+            Assert.DoesNotThrow(() => gameController.RunGame());
+        }
+    }
+
+    public class MockIU : IUserInterface
+    {
+
+        public Stack<string> inputs = new();
+        public List<string> outputs = new();
+        public MockIU()
+        {
+            inputs.Push("PlayerName");
+        }
+
+        string IUserInterface.Input()
+        {
+            if (GameService.target is not null && !inputs.Contains("n"))
+            {
+                inputs.Push("n");
+                inputs.Push(GameService.target);
+            }
+            return inputs.Pop();
+        }
+
+        void IUserInterface.Output(string text, bool newLine)
+        {
+            outputs.Add(text);
         }
     }
 }

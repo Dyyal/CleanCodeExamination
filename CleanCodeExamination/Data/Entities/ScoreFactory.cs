@@ -4,13 +4,15 @@
     {
         public static Score CreateScore(Player player, int guesses)
         {
-            return new Score()
+            Score score = new Score()
             {
                 ScoreId = Guid.NewGuid().ToString(),
                 Guesses = guesses,
                 RoundsPlayed = 1,
                 PlayerId = player.Id,
             };
+            score.Average = Average(score);
+            return score;
         }
         public static Score UpdateScore(int guesses, Score score)
         {
