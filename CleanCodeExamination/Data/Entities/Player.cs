@@ -1,9 +1,8 @@
-﻿namespace CleanCodeExamination.Data.Entities
+﻿namespace CleanCodeExamination.Data.Entities;
+
+public class Player
 {
-    public class Player
-    {
-        public string Id { get; set; }
-        public string Name { get; set; }
-        public Score Score { get; set; }
-    }
+    public string Id { get; set; }
+    public string Name { get; set; }
+    public Score Score { get; set; }
 }

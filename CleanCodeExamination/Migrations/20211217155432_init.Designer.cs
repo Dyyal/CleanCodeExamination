@@ -10,8 +10,8 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace CleanCodeExamination.Migrations
 {
     [DbContext(typeof(Context))]
-    [Migration("20211203120206_v8")]
-    partial class v8
+    [Migration("20211217155432_init")]
+    partial class init
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
@@ -42,9 +42,6 @@ namespace CleanCodeExamination.Migrations
                     b.Property<int>("Guesses")
                         .HasColumnType("INTEGER");
 
-                    b.Property<int>("Highscore")
-                        .HasColumnType("INTEGER");
-
                     b.Property<string>("PlayerId")
                         .HasColumnType("TEXT");
 
@@ -53,7 +50,8 @@ namespace CleanCodeExamination.Migrations
 
                     b.HasKey("ScoreId");
 
-                    b.HasIndex("PlayerId");
+                    b.HasIndex("PlayerId")
+                        .IsUnique();
 
                     b.ToTable("Scores");
                 });
@@ -61,8 +59,8 @@ namespace CleanCodeExamination.Migrations
             modelBuilder.Entity("CleanCodeExamination.Data.Entities.Score", b =>
                 {
                     b.HasOne("CleanCodeExamination.Data.Entities.Player", "Player")
-                        .WithMany("Score")
-                        .HasForeignKey("PlayerId");
+                        .WithOne("Score")
+                        .HasForeignKey("CleanCodeExamination.Data.Entities.Score", "PlayerId");
 
                     b.Navigation("Player");
                 });

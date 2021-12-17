@@ -1,13 +1,12 @@
-﻿namespace CleanCodeExamination.Services
+﻿namespace CleanCodeExamination.Services;
+
+public interface IPlayerInterface
 {
-    public interface IPlayerInterface
-    {
-        void EnterPlayerName();
+    void EnterPlayerName();
 
-        void CreatePlayer(string playerName);
-        string GetPlayer();
-        void UpdatePlayerScore(string playerName, int guesses);
+    void CreatePlayer(string playerName);
+    string GetPlayer();
+    void UpdatePlayerScore(string playerName, int guesses);
 
-        void PlayersHighscore();
-    }
+    void PlayersHighscore();
 }

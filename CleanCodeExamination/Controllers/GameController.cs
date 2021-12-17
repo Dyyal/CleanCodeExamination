@@ -1,17 +1,16 @@
-﻿namespace CleanCodeExamination.Controllers
+﻿namespace CleanCodeExamination.Controllers;
+
+public class GameController
 {
-    public class GameController
+    private readonly IGameInterface _game;
+
+    public GameController(IGameInterface game)
     {
-        private readonly IGameInterface _game;
+        _game = game;
+    }
 
-        public GameController(IGameInterface game)
-        {
-            _game = game;
-        }
-
-        public void RunGame()
-        {
-            _game.StartGame();
-        }
+    public void RunGame()
+    {
+        _game.StartGame();
     }
 }
