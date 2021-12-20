@@ -11,7 +11,6 @@ public class Tests
     MockIU ui;
     IGameInterface game;
     IPlayerInterface player;
-    public static string target;
 
     [OneTimeSetUp]
     public void Setup()
@@ -116,6 +115,7 @@ public class Tests
 
         Assert.IsNotNull(() => gameController.RunGame());
         Assert.DoesNotThrow(() => gameController.RunGame());
+        Assert.Contains("BBBB,", ui.outputs);
     }
 }
 
